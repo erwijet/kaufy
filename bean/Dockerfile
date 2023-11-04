@@ -10,7 +10,7 @@ RUN cargo install sea-orm-cli --bin sea
 COPY migration/ /app/migration
 WORKDIR /app
 
-RUN sea mirgrate up
+RUN sea migrate up
 
 ##
 
