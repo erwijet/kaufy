@@ -24,7 +24,7 @@ EOF
 
 FROM debian:bullseye-slim AS app
 COPY --from=build /bean/target/release/bean /bean
-COPY --from-build /bean/entity entity/
+COPY --from=build /bean/entity entity/
 
 COPY .env /.env
 
