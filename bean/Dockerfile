@@ -33,7 +33,7 @@ RUN <<EOF
   apt-get install -y ca-certificates
   update-ca-certificates
 
-  cargo install sea_orm --bin sea
+  cargo install sea-orm-cli --bin sea
   sea migrate up
 EOF
 
