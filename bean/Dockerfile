@@ -22,12 +22,11 @@ EOF
 
 ##
 
-FROM debian:bullseye-slim AS app
+FROM rust:1.70 AS app
 COPY --from=build /bean/target/release/bean /bean
 COPY --from=build /bean/entity entity/
 
 COPY .env /.env
-
 
 RUN <<EOF
   apt-get update
