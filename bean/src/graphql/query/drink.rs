@@ -3,13 +3,7 @@ use std::ops::Deref;
 use async_graphql::{ComplexObject, Context, Object, Result};
 use entity::async_graphql::{self, SimpleObject};
 use entity::sea_orm::{ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
-use entity::{
-    addon::{self},
-    base::{self},
-    temperature::{self},
-    user::{self},
-};
-use entity::{drink, drink_addon};
+use entity::{addon, base, drink, drink_addon, temperature, user};
 
 use crate::db::Database;
 use crate::graphql::schema::OwnerID;
@@ -88,6 +82,17 @@ pub struct DrinkQuery;
 
 #[Object]
 impl DrinkQuery {
+    pub async fn drink(
+        &self,
+        ctx: &Context<'_>,
+        #[graphql(desc = "The ID of the drink")] id: i32,
+    ) -> Result<Option<DrinkReturn>> {
+        let db = ctx.data::<Database>().unwrap();
+        let drink = drink::Entity::find_by_id(id).one(db).await?;
+
+        Ok(drink.map(Into::into))
+    }
+
     pub async fn drinks(&self, ctx: &Context<'_>) -> Result<Vec<DrinkReturn>> {
         let db = ctx.data::<Database>().unwrap();
 

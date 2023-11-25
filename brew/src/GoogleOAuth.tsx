@@ -28,7 +28,6 @@ const GoogleOAuth = () => {
     ).then((res) => res.json());
 
     setWithToken(token);
-
     nav("/");
   }
 

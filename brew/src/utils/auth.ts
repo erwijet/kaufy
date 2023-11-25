@@ -24,6 +24,7 @@ type UserStore = {
   };
 
   setWithToken: (jwt: string) => void;
+  clear: () => void;
 };
 
 const authInfoSchema = z.object({
@@ -37,6 +38,10 @@ const authInfoSchema = z.object({
 export const useUserStore = create<UserStore>()(
   persist(
     (set) => ({
+      clear() {
+        set({ info: undefined });
+      },
+
       setWithToken(jwt) {
         const res = authInfoSchema.parse(jwtDecode(jwt));
 
@@ -50,11 +55,15 @@ export const useUserStore = create<UserStore>()(
             tok: jwt,
           },
         });
+
       },
     }),
     {
       name: "dev.holewinski.kaufy.user",
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        info: state.info
+      })
     },
   ),
 );

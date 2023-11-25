@@ -1,7 +1,8 @@
 pub mod drink;
-pub mod tag;
+pub mod order;
 
 use self::drink::DrinkMutation;
+use self::order::OrderMutation;
 
 #[derive(entity::async_graphql::MergedObject, Default)]
-pub struct Mutation(DrinkMutation);
+pub struct Mutation(DrinkMutation, OrderMutation);

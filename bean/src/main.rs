@@ -2,18 +2,21 @@ mod db;
 mod graphql;
 mod jwt;
 mod middleware;
+mod pusher;
 
-use std::error::Error;
+use std::{borrow::BorrowMut, error::Error};
 
 use async_graphql::http::GraphiQLSource;
-use entity::sea_orm::{ActiveModelTrait, Set};
+use entity::{
+    acl::{AclRole, Roleset},
+    sea_orm::{ActiveModelTrait, Set},
+};
 use middleware::JwtMiddleware;
 use poem::{
-    error::{InternalServerError, NotFoundError, Unauthorized},
-    http::{Request, StatusCode, Uri},
+    error::{InternalServerError, Unauthorized},
     listener::TcpListener,
     middleware::Cors,
-    web::{Html, Path, Query},
+    web::{Html, Query},
     *,
 };
 
@@ -23,6 +26,7 @@ use dotenv::dotenv;
 use graphql::schema::build_schema;
 use poem::{get, handler, IntoResponse, Route};
 use serde::{Deserialize, Serialize};
+use tap::Pipe;
 
 use crate::{graphql::schema::OwnerID, jwt::Claims};
 
@@ -31,7 +35,6 @@ struct GoogleTokenInfo {
     email: String,
     given_name: String,
     family_name: String,
-    hd: String,
     picture: String,
 }
 
@@ -64,16 +67,8 @@ async fn auth_with_google(Query(AuthReq { token }): Query<AuthReq>) -> poem::Res
         given_name,
         family_name,
         picture,
-        hd,
         ..
     } = serde_json::from_str(&res_txt).map_err(InternalServerError)?;
-
-    if hd != "bryx.com" {
-        return Err(poem::Error::from_string(
-            format!("Tokens are only permitted to be administered to 'bryx' accounts"),
-            StatusCode::UNAUTHORIZED,
-        ));
-    }
 
     let lookup_res = entity::user::Entity::find_by_email(&email)
         .one(&db)
@@ -88,6 +83,7 @@ async fn auth_with_google(Query(AuthReq { token }): Query<AuthReq>) -> poem::Res
             family_name: Set(family_name),
             given_name: Set(given_name),
             picture: Set(picture),
+            roleset: Set(Roleset::new().into()),
             ..Default::default()
         }
         .insert(&db)
@@ -100,17 +96,38 @@ async fn auth_with_google(Query(AuthReq { token }): Query<AuthReq>) -> poem::Res
     Ok(serde_json::to_string_pretty(&AuthRes { token }).unwrap())
 }
 
+#[derive(Deserialize)]
+struct GraphiqlQuery {
+    tok: Option<String>,
+}
+
 #[handler]
-async fn graphiql() -> impl IntoResponse {
-    Html(GraphiQLSource::build().endpoint("/graphql").finish())
+async fn graphiql(Query(GraphiqlQuery { tok }): Query<GraphiqlQuery>) -> impl IntoResponse {
+    let builder = GraphiQLSource::build().endpoint("/graphql");
+
+    Html(if let Some(tok) = tok {
+        builder
+            .header("Authorization", &format!("Bearer {tok}"))
+            .finish()
+    } else {
+        builder.finish()
+    })
+}
+
+#[handler]
+async fn schema() -> impl IntoResponse {
+    let owner_id = -1 as OwnerID;
+    build_schema(owner_id).await.sdl()
 }
 
 #[handler]
 async fn index(req: GraphQLRequest, data: poem::web::Data<&Claims>) -> GraphQLResponse {
-    let mut req = req.0;
-
-    let schema = build_schema(data.id as OwnerID).await;
-    return schema.execute(req).await.into();
+    let req = req.0;
+    build_schema(data.id as OwnerID)
+        .await
+        .execute(req)
+        .await
+        .into()
 }
 
 #[tokio::main]
@@ -120,6 +137,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let app = Route::new()
         .at("/graphql", get(graphiql).post(index).with(JwtMiddleware))
+        .at("/schema", get(schema))
         .at("/oauth/google", post(auth_with_google))
         .with(Cors::new());
 

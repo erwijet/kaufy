@@ -10,7 +10,7 @@ use crate::graphql::query::drink::DrinkReturn;
 use crate::graphql::schema::OwnerID;
 
 #[derive(InputObject)]
-pub struct CreateDrinkObject {
+pub struct DrinkInputObject {
     pub name: String,
     pub temperature_id: i32,
     pub base_id: i32,
@@ -28,10 +28,10 @@ pub struct DrinkMutation;
 
 #[Object]
 impl DrinkMutation {
-    pub async fn create_drink(
+    pub async fn add_drink(
         &self,
         ctx: &Context<'_>,
-        input: CreateDrinkObject,
+        input: DrinkInputObject,
     ) -> Result<DrinkReturn> {
         let db = ctx.data::<Database>().unwrap();
         let owner_id = ctx.data::<OwnerID>().unwrap().clone();
@@ -56,6 +56,48 @@ impl DrinkMutation {
         }
 
         Ok(drink.into())
+    }
+
+    pub async fn update_drink(
+        &self,
+        ctx: &Context<'_>,
+        id: i32,
+        update: DrinkInputObject,
+    ) -> Result<DrinkReturn> {
+        let db = ctx.data::<Database>().unwrap();
+        let owner_id = ctx.data::<OwnerID>().unwrap();
+
+        let drink = drink::Entity::find_by_id(id)
+            .one(db)
+            .await
+            .map_err(|e| e.to_string())?
+            .ok_or("Not found")?;
+
+        if drink.owner_id != *owner_id {
+            Err("No ownership")?;
+        }
+
+        drink_addon::Entity::delete_many()
+            .filter(drink_addon::Column::DrinkId.eq(drink.id))
+            .exec(db)
+            .await?;
+
+        for addon_id in update.addon_ids {
+            drink_addon::ActiveModel {
+                addon_id: Set(addon_id),
+                drink_id: Set(drink.id),
+            }
+            .insert(db)
+            .await?;
+        }
+
+        let mut active_drink: drink::ActiveModel = drink.into();
+
+        active_drink.name = Set(update.name);
+        active_drink.base_id = Set(update.base_id);
+        active_drink.temp_id = Set(update.temperature_id);
+        
+        Ok(active_drink.update(db).await?.into())
     }
 
     pub async fn delete_drink(&self, ctx: &Context<'_>, id: i32) -> Result<DeleteDrinkResult> {

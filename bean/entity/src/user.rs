@@ -13,6 +13,7 @@ pub struct Model {
     pub given_name: String,
     pub family_name: String,
     pub picture: String,
+    pub roleset: u32
 }
 
 impl ActiveModelBehavior for ActiveModel {}

@@ -1,25 +1,34 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { MantineProvider, createTheme } from "@mantine/core";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   ApolloClient,
-  InMemoryCache,
   ApolloProvider,
+  InMemoryCache,
   createHttpLink,
 } from "@apollo/client";
+import { MantineProvider, Notification, createTheme } from "@mantine/core";
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 
 import { setContext } from "@apollo/client/link/context";
 
-import "@mantine/core/styles.css";
 import "@/main.css";
+import "@mantine/core/styles.css";
 
-import App from "@/App";
-import Login from "@/Login";
+import Drinks from "@/Drinks";
 import GoogleOAuth from "@/GoogleOAuth";
+import Home from "@/Home";
+import Login from "@/Login";
+import Logout from "@/Logout";
+import Orders from "@/Orders";
+import Settings from "@/Settings";
 import { useUserStore } from "@/utils/auth";
+import toast, { ToastBar, Toaster } from "react-hot-toast";
+import { Layout } from "./layout";
+import { Notifier } from "./notifier";
 
-const theme = createTheme({});
+const theme = createTheme({
+  fontFamily: "Geist",
+});
 
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_API_BASE_URL + "/graphql",
@@ -43,13 +52,44 @@ const gqlClient = new ApolloClient({
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <MantineProvider theme={theme}>
+    <MantineProvider theme={theme} defaultColorScheme="dark">
       <ApolloProvider client={gqlClient}>
+        <Toaster position="bottom-center">
+          {(t) => (
+            <ToastBar toast={t} style={{ padding: "0px" }}>
+              {({ icon, message }) => (
+                <Notification
+                  title={icon}
+                  withBorder
+                  withCloseButton
+                  onClose={() => toast.dismiss(t.id)}
+                >
+                  {message}
+                </Notification>
+              )}
+            </ToastBar>
+          )}
+        </Toaster>
+        <Notifier />
         <BrowserRouter>
           <Routes>
-            <Route index Component={App} />
             <Route path="login" Component={Login} />
-            <Route path="oauth/google" Component={GoogleOAuth} />
+            <Route element={<Layout />}>
+              <Route
+                index
+                Component={() => {
+                  const nav = useNavigate();
+                  useEffect(() => nav("/home"));
+                  return <></>;
+                }}
+              />
+              <Route path="logout" Component={Logout} />
+              <Route path="home" Component={Home} />
+              <Route path="orders" Component={Orders} />
+              <Route path="drinks" Component={Drinks} />
+              <Route path="settings" Component={Settings} />
+              <Route path="oauth/google" Component={GoogleOAuth} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </ApolloProvider>

@@ -46,32 +46,4 @@ pub enum Relation {
     Owner,
 }
 
-impl Related<super::addon::Entity> for Entity {
-    fn to() -> RelationDef {
-        super::drink_addon::Relation::Addon.def()
-    }
-
-    fn via() -> Option<RelationDef> {
-        Some(super::drink_addon::Relation::Addon.def().rev())
-    }
-}
-
-impl Related<super::temperature::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Temperature.def()
-    }
-}
-
-impl Related<super::base::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Base.def()
-    }
-}
-
-impl Related<super::user::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Owner.def()
-    }
-}
-
 impl_std_ops!(Entity);

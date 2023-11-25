@@ -8,9 +8,7 @@ pub struct Migration;
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let stmts = vec![
-            get_create_stmt_for_trait(entity::book::Entity),
-            get_create_stmt_for_trait(entity::tag::Entity),
-            get_create_stmt_for_trait(entity::book_tag::Entity),
+            get_create_stmt_for_trait(entity::user::Entity),
         ];
 
         for stmt in stmts {
@@ -22,9 +20,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let stmts = vec![
-            get_drop_stmt_for_trait(entity::book::Entity),
-            get_drop_stmt_for_trait(entity::tag::Entity),
-            get_drop_stmt_for_trait(entity::book_tag::Entity),
+            get_drop_stmt_for_trait(entity::user::Entity),
         ];
 
         for stmt in stmts {

@@ -5,7 +5,7 @@ import { getGoogleOAuthLink } from "@/utils/auth";
 
 const Login = () => {
   return (
-    <div className={"relative box-border bg-gray-900"}>
+    <div className={"relative box-border bg-gray-800"}>
       <Container
         size={700}
         className={
