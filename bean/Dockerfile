@@ -18,6 +18,9 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry <<EOF
   # update timestamps to force a new build (this time with the actual sources)
   touch /bean/src/main.rs
   cargo build --release
+
+  cargo install sea-orm-cli --bin sea
+  sea migrate up
 EOF
 
 ##
@@ -25,16 +28,12 @@ EOF
 FROM rust:1.70 AS app
 COPY --from=build /bean/target/release/bean /bean
 COPY --from=build /bean/entity entity/
-
-COPY .env /.env
+COPY --from=build /bean/db /bean/db
 
 RUN <<EOF
   apt-get update
   apt-get install -y ca-certificates
   update-ca-certificates
-
-  cargo install sea-orm-cli --bin sea
-  sea migrate up
 EOF
 
 CMD ["/bean"]
