@@ -28,7 +28,7 @@ EOF
 FROM rust:1.70 AS app
 COPY --from=build /bean/target/release/bean /bean
 COPY --from=build /bean/entity entity/
-COPY --from=build /bean/db /bean/db
+COPY --from=build /bean/db /db
 
 RUN <<EOF
   apt-get update
