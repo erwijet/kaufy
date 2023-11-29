@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
   ActionIcon,
-  AppShell,
   Avatar,
   Badge,
   Burger,
@@ -18,7 +17,6 @@ import {
 import { useState } from "react";
 import { LuPencil, LuTrash2 } from "react-icons/lu";
 import { DrinkBuilder } from "./DrinkBuilder";
-import { Navbar } from "./Navbar";
 import { graphql } from "./gql";
 import { useAuth, useUserStore } from "./utils/auth";
 import { getGradientFromNumber } from "./utils/color";

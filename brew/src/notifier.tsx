@@ -1,7 +1,7 @@
 import useWS from "react-use-websocket";
 import toast from "react-hot-toast";
 import { pipe } from "@tsly/core";
-import { useUserStore } from "./utils/auth";
+import { useUserStore } from "@/utils/auth";
 import { maybe } from "@tsly/maybe";
 
 export const Notifier = () => {

@@ -21,8 +21,8 @@ import { maybeParseInt } from "@tsly/core";
 import { maybe } from "@tsly/maybe";
 import { useEffect, useRef, useState } from "react";
 import { LuTrash2 } from "react-icons/lu";
-import { graphql } from "./gql";
-import { useAuth, useUserStore } from "./utils/auth";
+import { graphql } from "@/gql";
+import { useAuth, useUserStore } from "@/utils/auth";
 
 const ordersQuery = graphql(`
   query orders {
@@ -117,7 +117,7 @@ const Orders = () => {
   const [filterStatues, setFilterStatuses] = useState(["Queued", "Open"]);
   const [isNewOrderModalOpen, setNewOrderModalOpen] = useState(false);
 
-  const [cancelOrder, {}] = useMutation(
+  const [cancelOrder] = useMutation(
     graphql(`
       mutation CancelOrder($id: Int!) {
         cancelOrder(id: $id) {

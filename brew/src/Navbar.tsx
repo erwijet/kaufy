@@ -7,10 +7,10 @@ import {
   LuSettings,
   LuCode,
 } from "react-icons/lu";
-import classes from "./Navbar.module.css";
+import classes from "@/Navbar.module.css";
 import { IconContext } from "react-icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useUserStore } from "./utils/auth";
+import { useUserStore } from "@/utils/auth";
 import { forwardRef } from "react";
 
 const topLinksData = [

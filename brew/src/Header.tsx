@@ -9,7 +9,7 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useAuth, useUserStore } from "./utils/auth";
+import { useAuth, useUserStore } from "@/utils/auth";
 import { LuChevronDown, LuLogOut } from "react-icons/lu";
 import { IconContext } from "react-icons";
 

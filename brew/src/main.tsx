@@ -23,8 +23,8 @@ import Orders from "@/Orders";
 import Settings from "@/Settings";
 import { useUserStore } from "@/utils/auth";
 import toast, { ToastBar, Toaster } from "react-hot-toast";
-import { Layout } from "./layout";
-import { Notifier } from "./notifier";
+import { Layout } from "@/layout";
+import { Notifier } from "@/notifier";
 
 const theme = createTheme({
   fontFamily: "Geist",

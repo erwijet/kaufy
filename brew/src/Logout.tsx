@@ -1,7 +1,7 @@
 import { useDefer } from '@tsly/hooks';
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserStore } from "./utils/auth";
+import { useUserStore } from "@/utils/auth";
 
 const Logout = () => {
   const clear = useUserStore.getState().clear;

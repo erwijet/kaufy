@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useEffect } from "react";
-import { useUserStore } from "./utils/auth";
+import { useUserStore } from "@/utils/auth";
 
 const googleAccessTokenInfoSchema = z.object({ azp: z.string() });
 

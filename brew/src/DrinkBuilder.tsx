@@ -4,14 +4,14 @@ import { maybeParseInt } from "@tsly/core";
 import { Box, Button, MultiSelect, Select, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
-import { graphql } from "./gql";
+import { graphql } from "@/gql";
 import {
   addonsQuery,
   basesQuery,
   createDrinkMutation,
   tempsQuery,
   updateDrinkMutation,
-} from "./utils/gql";
+} from "@/utils/gql";
 
 const getDrinkByIdQuery = graphql(`
   query GetDrinkById($id: Int!) {

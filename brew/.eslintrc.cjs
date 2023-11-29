@@ -10,6 +10,8 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   plugins: ["react-refresh", "no-relative-import-paths"],
   rules: {
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
     "no-relative-import-paths/no-relative-import-paths": [
       "error",
       { allowSameFolder: false, rootDir: "src", prefix: "@" },

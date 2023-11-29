@@ -1,5 +1,5 @@
-import { Navbar } from "./Navbar";
-import { useAuth } from "./utils/auth";
+import { Navbar } from "@/Navbar";
+import { useAuth } from "@/utils/auth";
 
 const Home = () => {
   useAuth();
